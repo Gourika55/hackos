@@ -1,63 +1,125 @@
+import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Play } from "lucide-react";
+import { ArrowRight, Play, Zap } from "lucide-react";
+import ReactiveBackground from "./ReactiveBackground";
+import gsap from "gsap";
 
 const HeroSection = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // Staggered Text Reveal
+      gsap.from(".hero-line", {
+        y: 100,
+        opacity: 0,
+        duration: 1.2,
+        stagger: 0.15,
+        ease: "power4.out",
+        delay: 0.2
+      });
+
+      // Button Reveal
+      gsap.from(".hero-btn", {
+        scale: 0.8,
+        opacity: 0,
+        duration: 1,
+        ease: "back.out(1.7)",
+        delay: 1
+      });
+
+      // Stats Reveal
+      gsap.from(".hero-stat", {
+        x: -50,
+        opacity: 0,
+        duration: 1,
+        stagger: 0.1,
+        ease: "power2.out",
+        delay: 1.2
+      });
+
+    }, containerRef);
+
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Background effects */}
-      <div className="absolute inset-0 grid-pattern opacity-40 fade-mask-b" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] rounded-full bg-primary/5 blur-3xl" />
-      <div className="absolute top-1/3 left-1/4 w-[400px] h-[400px] rounded-full bg-primary/8 blur-3xl animate-pulse-slow" />
-      
-      <div className="container-narrow relative z-10 pt-32 pb-20 text-center">
-        {/* Badge */}
-        <div className="animate-fade-up inline-flex items-center gap-2 px-4 py-2 rounded-full border border-border/60 bg-card/40 backdrop-blur-sm mb-8">
-          <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
-          <span className="text-sm text-muted-foreground">Unified Campus Management</span>
-        </div>
-
-        {/* Main headline */}
-        <h1 className="animate-fade-up-delay-1 text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1] mb-6">
-          One platform to manage
-          <br />
-          <span className="gradient-text">every campus event</span>
-        </h1>
-
-        {/* Subtext */}
-        <p className="animate-fade-up-delay-2 max-w-2xl mx-auto text-lg md:text-xl text-muted-foreground leading-relaxed mb-10">
-          Centralize event approvals, resource booking, and student registrations. 
-          Eliminate conflicts, reduce overhead, and bring clarity to campus operations.
-        </p>
-
-        {/* CTA Buttons */}
-        <div className="animate-fade-up-delay-3 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Button variant="hero" size="xl" className="group">
-            Get started
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-          </Button>
-          <Button variant="hero-outline" size="xl" className="group">
-            <Play className="h-4 w-4" />
-            View demo
-          </Button>
-        </div>
-
-        {/* Stats */}
-        <div className="mt-20 grid grid-cols-3 gap-8 max-w-3xl mx-auto">
-          {[
-            { value: "50+", label: "Universities" },
-            { value: "10k+", label: "Events managed" },
-            { value: "99.9%", label: "Uptime" },
-          ].map((stat, i) => (
-            <div key={i} className="text-center">
-              <div className="text-3xl md:text-4xl font-bold mb-1">{stat.value}</div>
-              <div className="text-sm text-muted-foreground">{stat.label}</div>
-            </div>
-          ))}
-        </div>
+    <section ref={containerRef} className="relative h-screen w-full flex items-center overflow-hidden bg-black selection:bg-primary selection:text-black">
+      {/* WebGL Reactive Background */}
+      <div className="absolute inset-0 z-0 pointer-events-none opacity-60">
+        <ReactiveBackground />
       </div>
 
-      {/* Bottom gradient fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
+      <div className="container relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 h-full items-center">
+        {/* Left Content Area */}
+        <div className="lg:col-span-7 flex flex-col justify-center h-full pt-20">
+          
+          {/* Badge / Top Label */}
+          <div className="hero-line overflow-hidden mb-6">
+            <div className="inline-flex items-center gap-3 border border-white/20 rounded-full px-4 py-2 bg-white/5 backdrop-blur-sm">
+              <span className="h-2 w-2 rounded-full bg-primary animate-pulse"></span>
+              <span className="text-xs font-bold tracking-[0.2em] text-white/80 uppercase">
+                Campus OS v2.0
+              </span>
+            </div>
+          </div>
+
+          {/* Main Headline - Broken into lines for animation */}
+          <h1 ref={titleRef} className="text-6xl md:text-8xl lg:text-9xl font-black text-white leading-[0.9] tracking-tighter uppercase mb-8">
+            <div className="overflow-hidden"><div className="hero-line">Unified</div></div>
+            <div className="overflow-hidden"><div className="hero-line">Campus</div></div>
+            <div className="overflow-hidden"><div className="hero-line text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-400 to-gray-600">Orchestration</div></div>
+          </h1>
+
+          {/* Subtext */}
+          <div className="hero-line max-w-lg mb-12">
+            <p className="text-lg md:text-xl font-medium text-gray-400 leading-relaxed">
+              A full-service platform designing digital experiences for universities and students around the world.
+            </p>
+          </div>
+
+          {/* CTA Area */}
+          <div className="hero-btn flex items-center gap-6">
+            <Button className="agency-button bg-primary text-black hover:bg-white hover:text-black">
+              Get Started
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+            
+            <div className="flex items-center gap-4 group cursor-pointer">
+              <div className="h-12 w-12 rounded-full border border-white/30 flex items-center justify-center group-hover:bg-white group-hover:text-black transition-all duration-300">
+                <Play className="h-4 w-4 fill-current" />
+              </div>
+              <span className="text-sm font-bold uppercase tracking-widest text-white group-hover:text-primary transition-colors">
+                Watch Showreel
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Right / Bottom Content (Stats) */}
+        <div className="lg:col-span-5 flex flex-col justify-end pb-20 h-full pointer-events-none">
+           <div className="flex flex-col gap-8 pointer-events-auto">
+              {[
+                { label: "Universities", value: "50+" },
+                { label: "Events Managed", value: "10k+" },
+                { label: "Uptime", value: "99.9%" }
+              ].map((stat, i) => (
+                <div key={i} className="hero-stat group">
+                  <div className="text-sm font-bold text-gray-500 uppercase tracking-widest mb-1 group-hover:text-primary transition-colors">{stat.label}</div>
+                  <div className="text-4xl font-black text-white tracking-tighter">{stat.value}</div>
+                </div>
+              ))}
+           </div>
+        </div>
+      </div>
+      
+      {/* Decorative Progress Bar (Visual only, like reference) */}
+      <div className="absolute bottom-10 left-0 w-full px-8 md:px-20 z-20">
+         <div className="w-full h-[2px] bg-white/10 rounded-full overflow-hidden">
+            <div className="h-full bg-primary w-1/3 animate-[shimmer_2s_infinite]"></div>
+         </div>
+      </div>
     </section>
   );
 };

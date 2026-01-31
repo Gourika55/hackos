@@ -1,0 +1,17 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users collection:
+    // - Authenticated users can read any user profile (for finding students/organizers)
+    // - Users can only write/update their own profile
+    match /users/{userId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Default rule: Deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
